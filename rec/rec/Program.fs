@@ -57,6 +57,16 @@ let chose_case (arg: bool)=
      | true -> sumCifr
      | false -> factorial
 
+let rec number_traversal (n: int) (f: int -> int -> int) (init: int) : int =
+    let rec traverse n acc =
+        match n with
+        | 0 -> acc
+        | _ ->
+            let digit = n % 10
+            let newAcc = f acc digit
+            traverse (n / 10) newAcc
+    traverse n init
+
 [<EntryPoint>]
 let main (args : string[]) = 
     let res = solve 1.0 4.0 1.0
@@ -77,5 +87,9 @@ let main (args : string[]) =
     System.Console.WriteLine("Факториал числа вверх: {0}", factorial1 3)
     System.Console.WriteLine("Факториал числа вниз: {0}", factorial 3)
     System.Console.WriteLine("Логическая функция (вызываем сумму цифр): {0}", chose_case true 123)
-    System.Console.WriteLine("Логическая функция (вызываем факториал числа): {0}", chose_case false 5)
+    System.Console.WriteLine("Логическая функция (факториал): {0}", chose_case false 5)
+    System.Console.WriteLine("Сумма цифр через общий обход: {0} ", number_traversal 123 (+) 0 )
+    System.Console.WriteLine("Произведение цифр через общий обход: {0} ", number_traversal 123 (*) 1 )
+    System.Console.WriteLine("Максимальная цифра через общий обход: {0} ", number_traversal 123 (max) 0 )
+    System.Console.WriteLine("Минимальная цифра через общий обход: {0} ", number_traversal 123 (min) 1000 )
     0
