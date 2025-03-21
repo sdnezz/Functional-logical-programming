@@ -92,4 +92,8 @@ let main (args : string[]) =
     System.Console.WriteLine("Произведение цифр через общий обход: {0} ", number_traversal 123 (*) 1 )
     System.Console.WriteLine("Максимальная цифра через общий обход: {0} ", number_traversal 123 (max) 0 )
     System.Console.WriteLine("Минимальная цифра через общий обход: {0} ", number_traversal 123 (min) 1000 )
+    System.Console.WriteLine("Общий обход с лямбда - сумма: {0} ", number_traversal 123 (fun acc digit -> acc + digit) 0 )
+    System.Console.WriteLine("Общий обход с лямбда - умножение: {0} ", number_traversal 123 (fun acc digit -> acc * digit) 1 )
+    System.Console.WriteLine("Общий обход с лямбда - максимум: {0} ", number_traversal 123 (fun acc digit -> max acc digit) 0 )
+    System.Console.WriteLine("Общий обход с лямбда - минимум: {0} ", number_traversal 123 (fun acc digit -> min acc digit) 1000 )
     0
