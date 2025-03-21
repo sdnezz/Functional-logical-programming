@@ -32,6 +32,16 @@ let rec cifrSum n =
     if n = 0 then 0
     else (n%10) + (cifrSum (n/10))
 
+let sumCifr n =
+    let rec sumCifr1 n curSum = 
+        if n = 0 then curSum
+        else
+            let n1 = n / 10
+            let cifr = n % 10
+            let newSum = curSum + cifr
+            sumCifr1 n1 newSum
+    sumCifr1 n 0
+
 [<EntryPoint>]
 let main (args : string[]) = 
     let res = solve 1.0 4.0 1.0
@@ -48,4 +58,5 @@ let main (args : string[]) =
     System.Console.WriteLine("Объем цилиндра через оператор суперпозиции: {0}", cyl_volume_superposition h r)
     System.Console.WriteLine("Объем цилиндра через конвеер: {0}", s |> volume h)
     System.Console.WriteLine("сумма цифр рекурсией вверх: {0}", cifrSum 123)
+    System.Console.WriteLine("сумма цифр рекурсией вниз: {0}", sumCifr 123)
     0
