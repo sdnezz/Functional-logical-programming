@@ -42,6 +42,21 @@ let sumCifr n =
             sumCifr1 n1 newSum
     sumCifr1 n 0
 
+let rec factorial1 n = 
+    if n <=1 then 1 else n*factorial1 (n-1)
+
+let rec factorial n =
+    let rec fact1 n acc =
+        if n=1 then acc
+        else 
+            fact1 (n-1) (n*acc)
+    fact1 n 1
+
+let chose_case (arg: bool)= 
+    match arg with
+     | true -> sumCifr
+     | false -> factorial
+
 [<EntryPoint>]
 let main (args : string[]) = 
     let res = solve 1.0 4.0 1.0
@@ -59,4 +74,8 @@ let main (args : string[]) =
     System.Console.WriteLine("Объем цилиндра через конвеер: {0}", s |> volume h)
     System.Console.WriteLine("сумма цифр рекурсией вверх: {0}", cifrSum 123)
     System.Console.WriteLine("сумма цифр рекурсией вниз: {0}", sumCifr 123)
+    System.Console.WriteLine("Факториал числа вверх: {0}", factorial1 3)
+    System.Console.WriteLine("Факториал числа вниз: {0}", factorial 3)
+    System.Console.WriteLine("Логическая функция (вызываем сумму цифр): {0}", chose_case true 123)
+    System.Console.WriteLine("Логическая функция (вызываем факториал числа): {0}", chose_case false 5)
     0
