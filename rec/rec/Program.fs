@@ -28,6 +28,9 @@ let cyl_volume_curry h =
 let cyl_volume_superposition h =
     (circle_square) >> volume h
 
+let rec cifrSum n = 
+    if n = 0 then 0
+    else (n%10) + (cifrSum (n/10))
 
 [<EntryPoint>]
 let main (args : string[]) = 
@@ -44,4 +47,5 @@ let main (args : string[]) =
     System.Console.WriteLine("Объем цилиндра через каррирование: {0}", volumeFunc s)
     System.Console.WriteLine("Объем цилиндра через оператор суперпозиции: {0}", cyl_volume_superposition h r)
     System.Console.WriteLine("Объем цилиндра через конвеер: {0}", s |> volume h)
+    System.Console.WriteLine("сумма цифр рекурсией вверх: {0}", cifrSum 123)
     0
