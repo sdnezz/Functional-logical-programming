@@ -67,6 +67,16 @@ let rec number_traversal (n: int) (f: int -> int -> int) (init: int) : int =
             traverse (n / 10) newAcc
     traverse n init
 
+let rec number_traversal_bool (n: int) (f: int -> int -> int) (init: int) (p: int-> bool): int =
+    let rec traverse n acc =
+        match n with
+        | 0 -> acc
+        | _ ->
+            let digit = n % 10
+            let newAcc = if p digit then f acc digit else acc
+            traverse (n / 10) newAcc
+    traverse n init
+
 [<EntryPoint>]
 let main (args : string[]) = 
     let res = solve 1.0 4.0 1.0
@@ -96,4 +106,10 @@ let main (args : string[]) =
     System.Console.WriteLine("Общий обход с лямбда - умножение: {0} ", number_traversal 123 (fun acc digit -> acc * digit) 1 )
     System.Console.WriteLine("Общий обход с лямбда - максимум: {0} ", number_traversal 123 (fun acc digit -> max acc digit) 0 )
     System.Console.WriteLine("Общий обход с лямбда - минимум: {0} ", number_traversal 123 (fun acc digit -> min acc digit) 1000 )
+    let isEven digit = digit % 2 = 0
+    let notEven digit = digit % 2 <> 0
+    System.Console.WriteLine("Обход числа с условием - сумма четных: {0} ", number_traversal_bool 123 (+) 0 isEven)
+    System.Console.WriteLine("Обход числа с условием - пр-ие нечетных: {0} ", number_traversal_bool 123 (*) 1 notEven)
+    System.Console.WriteLine("Обход числа с условием - максимум четных: {0} ", number_traversal_bool 123 (max) 0 isEven)
+    System.Console.WriteLine("Обход числа с условием - минимум нечетных: {0} ", number_traversal_bool 123 (min) 1000 notEven)
     0
