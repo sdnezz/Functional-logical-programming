@@ -108,8 +108,20 @@ let main (args : string[]) =
     System.Console.WriteLine("Общий обход с лямбда - минимум: {0} ", number_traversal 123 (fun acc digit -> min acc digit) 1000 )
     let isEven digit = digit % 2 = 0
     let notEven digit = digit % 2 <> 0
+    let isPrime number = 
+        if number < 2 then false
+        else 
+            let rec check divisor =
+                if divisor * divisor > number then true
+                elif number % divisor = 0 then false
+                else check (divisor + 1)
+            check 2
+
     System.Console.WriteLine("Обход числа с условием - сумма четных: {0} ", number_traversal_bool 123 (+) 0 isEven)
     System.Console.WriteLine("Обход числа с условием - пр-ие нечетных: {0} ", number_traversal_bool 123 (*) 1 notEven)
     System.Console.WriteLine("Обход числа с условием - максимум четных: {0} ", number_traversal_bool 123 (max) 0 isEven)
     System.Console.WriteLine("Обход числа с условием - минимум нечетных: {0} ", number_traversal_bool 123 (min) 1000 notEven)
+    System.Console.WriteLine("1) Обход числа - количество четных: {0} ", number_traversal_bool 123 (fun acc digit -> acc + 1) 0 isEven)
+    System.Console.WriteLine("2) Обход числа - сумма цифр, больших 3: {0} ", number_traversal_bool 123 (+) 0 (fun digit -> digit > 3))
+    System.Console.WriteLine("3) Обход числа - максимальная простая цифра: {0} ", number_traversal_bool 1759 (max) 0 isPrime)
     0
