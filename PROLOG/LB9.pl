@@ -189,3 +189,44 @@ divisors_up(N, Count) :-
     N > 0,
     divisors_up(N, 1, Count).
 
+% Определяем возможные цвета
+color(white).
+color(green).
+color(blue).
+
+% Основной предикат для решения задачи
+solve(Dresses, Shoes) :-
+    % Определяем списки для платьев и туфель трех подруг
+    Dresses = [AniDress, ValyaDress, NatashaDress],
+    Shoes = [AniShoes, ValyaShoes, NatashaShoes],
+    
+    % Все цвета платьев и туфель принадлежат множеству {white, green, blue}
+    maplist(color, Dresses),
+    maplist(color, Shoes),
+    
+    % Условие 1: У Ани цвета платья и туфель совпадают
+    AniDress = AniShoes,
+    
+    % Условие 2: У Вали ни платье, ни туфли не белые
+    ValyaDress \= white,
+    ValyaShoes \= white,
+    
+    % Условие 3: Наташа в зеленых туфлях
+    NatashaShoes = green,
+    
+    % Все платья должны быть разными
+    all_different(Dresses),
+    
+    % Все туфли должны быть разными
+    all_different(Shoes).
+
+% Вспомогательный предикат для проверки, что все элементы списка различны
+all_different([]).
+all_different([H|T]) :- \+ member(H, T), all_different(T).
+
+% Предикат для вывода результата на английском с транслитерацией
+print_solution :-
+    solve([AniDress, ValyaDress, NatashaDress], [AniShoes, ValyaShoes, NatashaShoes]),
+    write('Ani: plat\'ye - '), write(AniDress), write(', tufli - '), write(AniShoes), nl,
+    write('Valya: plat\'ye - '), write(ValyaDress), write(', tufli - '), write(ValyaShoes), nl,
+    write('Natasha: plat\'ye - '), write(NatashaDress), write(', tufli - '), write(NatashaShoes), nl.
