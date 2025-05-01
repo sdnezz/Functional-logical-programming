@@ -18,7 +18,7 @@ get_vertices(P, Vertices) :-                        % Формирует спи�
 
 % Генерация всех возможных дуг
 all_possible_edges(Vertices, AllEdges) :-           % Создает список всех дуг [U, V]
-    findall([U, V], (in_list(Vertices, U), in_list(Vertices, V), U \= V), AllEdges).  % Собирает пары U ≠ V
+    findall([U, V], (in_list(Vertices, U), in_list(Vertices, V)), AllEdges).  % Собирает все пары, включая петли
 
 % Рекурсивный метод генерации (p, q)-графов
 pq_graph_recursive(Vertices, Q, Graph) :-           % Генерирует граф с Q дугами
@@ -36,7 +36,7 @@ pq_graph_recursive_helper(Edges, Q, Acc, Graph) :-  % Рекурсивно вы�
 % Запись в файл с сортировкой дуг для устранения дублирования
 write_pq_graph_recursive_to_file(P, Q, File) :-     % Записывает графы в файл
     get_vertices(P, Vertices),                      % Получает P вершин
-    MaxEdges is P * (P - 1),                        % Вычисляет максимум дуг: P*(P-1)
+    MaxEdges is P * P,                              % Вычисляет максимум дуг: P^2
     (   Q > MaxEdges                                % Проверяет, допустимо ли Q
     ->  write('Error: Q exceeds maximum possible edges ('), write(MaxEdges), write(').'), nl  % Выводит ошибку, если Q большое
     ;   open(File, write, Stream),                  % Открывает файл для записи
