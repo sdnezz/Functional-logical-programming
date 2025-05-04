@@ -1,39 +1,104 @@
-﻿open System
+﻿// Определение списка первых 6 простых чисел, используемых для построения числа n.
+// Эти числа выбраны, так как задача требует минимизировать n, а меньшие простые числа дают меньший вклад в произведение.
+let primes = [2; 3; 5; 7; 11; 13]
 
-let rec calculateExponents primes target currentProd currentExponents =
-    match primes with
-    | [] -> 
-        if currentProd > target then 
-            Some(currentExponents |> List.rev) 
-        else 
-            None
-    | p::rest ->
-        let maxExp = 
-            let remainingTarget = target / currentProd
-            if remainingTarget <= 1 then 
-                0
-            else 
-                (log (float remainingTarget) / log 3.0 |> ceil |> int)
-        
-        let rec tryExponent e =
-            if e > maxExp then 
-                None
-            else
-                let newProd = currentProd * (2 * e + 1)
-                match calculateExponents rest target newProd (e::currentExponents) with
-                | Some(exps) -> Some(exps)
-                | None -> tryExponent (e + 1)
-        
-        tryExponent 0
-
-// Оптимальные показатели степеней для минимального n
-let primes = [2L; 3L; 5L; 7L; 11L; 13L] // int64
-let exponents = [2; 2; 1; 1; 1; 1] // Показатели для n = 2^2 * 3^2 * 5^1 * 7^1 * 11^1 * 13^1
-
-// Вычисление n с использованием pown для int64
-let n = 
+// Функция для вычисления n на основе показателей степеней простых чисел.
+// Принимает список показателей exponents (например, [2; 1; 0; ...]) и возвращает n = 2^a * 3^b * 5^c * ... * 13^f.
+let calculateN exponents =
+    // Объединяем простые числа и показатели в пары (например, [(2, 2); (3, 1); ...]).
     List.zip primes exponents
-    |> List.map (fun (p, e) -> pown p e) // pown поддерживает int64
-    |> List.fold (*) 1L
+    // Преобразуем каждую пару (простое число, показатель) в простое число, возведенное в степень.
+    |> List.map (fun (p, e) -> pown p e)
+    // Перемножаем все полученные значения, чтобы получить итоговое n.
+    |> List.fold (*) 1
 
-printfn "Минимальное n: %d" (int n)
+// Основная функция для поиска минимального n, удовлетворяющего условию задачи.
+let findMinExponents () =
+    // Рекурсивная функция, перебирающая все возможные комбинации показателей.
+    // - exponents: текущая комбинация показателей (например, [2; 1; 0; ...]).
+    // - minN: текущее минимальное найденное n (тип Option<int>, так как изначально значение отсутствует).
+    let rec loop exponents minN =
+        // Вычисляем текущее значение n на основе текущих показателей.
+        let n = calculateN exponents
+        // Выводим текущие показатели и n для отладки.
+        printfn "Показатели: %A | n = %d" exponents n
+
+        // Вычисляем произведение (2a + 1)(2b + 1)... для текущих показателей.
+        // Это значение связано с количеством делителей n^2: если product > 2000, то решений > 1000.
+        let product = 
+            exponents 
+            |> List.fold (fun acc e -> acc * (2 * e + 1)) 1  // Пример: [2; 2; 1; 1; 1; 1] → (5*5*3*3*3*3) = 2025
+
+        // Проверяем, превышает ли product 2000 (эквивалентно (product + 1)/2 > 1000 решений).
+        let currentMin = 
+            if product > 2000 then 
+                // Если условие выполнено, обновляем минимальное n.
+                match minN with
+                | Some(currentMin) -> 
+                    // Если текущее n меньше сохраненного, обновляем значение.
+                    if n < currentMin then Some(n) else minN
+                | None -> 
+                    // Если minN еще не задан, сохраняем текущее n.
+                    Some(n)
+            else 
+                // Условие не выполнено — оставляем minN без изменений.
+                minN
+
+        // Рекурсивная функция для перебора показателей.
+        // - exps: текущий список показателей.
+        // - idx: индекс текущего показателя, который нужно увеличить.
+        let rec increment exps idx =
+            match exps, idx with
+            // Если список пуст, возвращаем None (конец перебора).
+            | [], _ -> None
+            // Если достигли нужного индекса (idx), обрабатываем текущий показатель.
+            | e::rest, i when i = idx ->
+                if e < 2 then
+                    // Если показатель меньше 2, увеличиваем его на 1.
+                    (e + 1) :: rest |> Some  // Пример: [1; 0; ...] → [2; 0; ...]
+                else
+                    // Если показатель равен 2, сбрасываем его в 0 и переходим к следующему индексу.
+                    match increment rest (i + 1) with
+                    | Some(newRest) -> 
+                        // Рекурсивно увеличиваем следующий показатель.
+                        (0 :: newRest) |> Some  // Пример: [2; 2; ...] → [0; 0; 1; ...]
+                    | None -> None
+            // Если текущий индекс не совпадает с idx, продолжаем поиск.
+            | e::rest, i -> 
+                match increment rest i with
+                | Some(updated) -> 
+                    // Обновляем хвост списка и сохраняем текущий показатель.
+                    (e :: updated) |> Some
+                | None -> None
+
+        // Генерируем следующую комбинацию показателей, начиная с индекса 0.
+        match increment exponents 0 with
+        | Some(updated) -> 
+            // Если новая комбинация существует, продолжаем перебор.
+            loop updated currentMin
+        | None -> 
+            // Если комбинаций больше нет, возвращаем текущий минимум.
+            currentMin
+
+    // Начинаем перебор с нулевых показателей: [0; 0; 0; 0; 0; 0].
+    let initial = [0; 0; 0; 0; 0; 0]
+    // Запускаем рекурсивный перебор и обрабатываем результат.
+    match loop initial None with
+    | Some(n) -> 
+        // Если решение найдено, выводим его.
+        printfn "Найдено минимальное n: %d" n
+        Some(n)
+    | None -> 
+        // Если решение не найдено, возвращаем None.
+        None
+
+// Функция для вывода результата.
+let findMinN () =
+    match findMinExponents () with
+    | Some(n) -> 
+        printfn "Ответ: %d" n  // Выводим найденное минимальное n.
+    | None -> 
+        failwith "Решение не найдено"  // Если решение отсутствует, генерируем ошибку.
+
+// Запуск программы.
+findMinN () |> ignore
